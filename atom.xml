@@ -5,9 +5,9 @@
   
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://yoursite.com/"/>
+  <link href="https:mubai.site/"/>
   <updated>2019-04-02T08:45:38.797Z</updated>
-  <id>http://yoursite.com/</id>
+  <id>https:mubai.site/</id>
   
   <author>
     <name>沐白</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>5.1节日旅游攻略</title>
-    <link href="http://yoursite.com/tags/2019-3-31-5.1%E6%97%85%E6%B8%B8%E6%94%BB%E7%95%A5/"/>
-    <id>http://yoursite.com/tags/2019-3-31-5.1旅游攻略/</id>
+    <link href="https:mubai.site/tags/2019-3-31-5.1%E6%97%85%E6%B8%B8%E6%94%BB%E7%95%A5/"/>
+    <id>https:mubai.site/tags/2019-3-31-5.1旅游攻略/</id>
     <published>2019-03-30T16:00:00.000Z</published>
     <updated>2019-04-02T08:45:38.797Z</updated>
     
@@ -31,17 +31,17 @@
     
     </summary>
     
-      <category term="闲文" scheme="http://yoursite.com/categories/%E9%97%B2%E6%96%87/"/>
+      <category term="闲文" scheme="https:mubai.site/categories/%E9%97%B2%E6%96%87/"/>
     
     
-      <category term="闲文" scheme="http://yoursite.com/tags/%E9%97%B2%E6%96%87/"/>
+      <category term="闲文" scheme="https:mubai.site/tags/%E9%97%B2%E6%96%87/"/>
     
   </entry>
   
   <entry>
     <title>Me</title>
-    <link href="http://yoursite.com/tags/Me/"/>
-    <id>http://yoursite.com/tags/Me/</id>
+    <link href="https:mubai.site/tags/Me/"/>
+    <id>https:mubai.site/tags/Me/</id>
     <published>2019-02-19T16:00:00.000Z</published>
     <updated>2019-04-02T09:49:07.800Z</updated>
     
@@ -54,14 +54,14 @@
     </summary>
     
     
-      <category term="简历" scheme="http://yoursite.com/tags/%E7%AE%80%E5%8E%86/"/>
+      <category term="简历" scheme="https:mubai.site/tags/%E7%AE%80%E5%8E%86/"/>
     
   </entry>
   
   <entry>
     <title>物联网通信-WiFi/BT/ZigBee芯片级方案解析</title>
-    <link href="http://yoursite.com/tags/2018-10-9-%E7%89%A9%E8%81%94%E7%BD%91%E9%80%9A%E4%BF%A1-WiFi:BT:ZigBee%E8%8A%AF%E7%89%87%E7%BA%A7%E6%96%B9%E6%A1%88%E8%A7%A3%E6%9E%90/"/>
-    <id>http://yoursite.com/tags/2018-10-9-物联网通信-WiFi:BT:ZigBee芯片级方案解析/</id>
+    <link href="https:mubai.site/tags/2018-10-9-%E7%89%A9%E8%81%94%E7%BD%91%E9%80%9A%E4%BF%A1-WiFi:BT:ZigBee%E8%8A%AF%E7%89%87%E7%BA%A7%E6%96%B9%E6%A1%88%E8%A7%A3%E6%9E%90/"/>
+    <id>https:mubai.site/tags/2018-10-9-物联网通信-WiFi:BT:ZigBee芯片级方案解析/</id>
     <published>2018-10-08T16:00:00.000Z</published>
     <updated>2019-04-02T08:45:23.217Z</updated>
     
@@ -77,17 +77,17 @@
     
     </summary>
     
-      <category term="物联网" scheme="http://yoursite.com/categories/%E7%89%A9%E8%81%94%E7%BD%91/"/>
+      <category term="物联网" scheme="https:mubai.site/categories/%E7%89%A9%E8%81%94%E7%BD%91/"/>
     
     
-      <category term="物联网" scheme="http://yoursite.com/tags/%E7%89%A9%E8%81%94%E7%BD%91/"/>
+      <category term="物联网" scheme="https:mubai.site/tags/%E7%89%A9%E8%81%94%E7%BD%91/"/>
     
   </entry>
   
   <entry>
     <title>Nexus+Maven搭建私有库</title>
-    <link href="http://yoursite.com/tags/2018-7-12-Nexus+Maven%E6%90%AD%E5%BB%BA%E7%A7%81%E6%9C%89%E5%BA%93/"/>
-    <id>http://yoursite.com/tags/2018-7-12-Nexus+Maven搭建私有库/</id>
+    <link href="https:mubai.site/tags/2018-7-12-Nexus+Maven%E6%90%AD%E5%BB%BA%E7%A7%81%E6%9C%89%E5%BA%93/"/>
+    <id>https:mubai.site/tags/2018-7-12-Nexus+Maven搭建私有库/</id>
     <published>2018-07-11T16:00:00.000Z</published>
     <updated>2019-04-03T08:02:36.967Z</updated>
     
@@ -106,17 +106,17 @@
     
     </summary>
     
-      <category term="Android" scheme="http://yoursite.com/categories/Android/"/>
+      <category term="Android" scheme="https:mubai.site/categories/Android/"/>
     
     
-      <category term="Maven" scheme="http://yoursite.com/tags/Maven/"/>
+      <category term="Maven" scheme="https:mubai.site/tags/Maven/"/>
     
   </entry>
   
   <entry>
     <title>Android Gradle</title>
-    <link href="http://yoursite.com/tags/2018-2-26-Android%20Gradle%20%E4%B8%AD%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/"/>
-    <id>http://yoursite.com/tags/2018-2-26-Android Gradle 中遇到的问题/</id>
+    <link href="https:mubai.site/tags/2018-2-26-Android%20Gradle%20%E4%B8%AD%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/"/>
+    <id>https:mubai.site/tags/2018-2-26-Android Gradle 中遇到的问题/</id>
     <published>2018-02-25T16:00:00.000Z</published>
     <updated>2019-04-02T08:45:13.042Z</updated>
     
@@ -131,46 +131,17 @@
     
     </summary>
     
-      <category term="Android" scheme="http://yoursite.com/categories/Android/"/>
+      <category term="Android" scheme="https:mubai.site/categories/Android/"/>
     
     
-      <category term="Android" scheme="http://yoursite.com/tags/Android/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Android各大应用商店应用图标、截图尺寸</title>
-    <link href="http://yoursite.com/tags/2018-2-5-Android%E5%90%84%E5%A4%A7%E5%95%86%E5%BA%97%E5%BA%94%E7%94%A8%E5%9B%BE%E6%A0%87%E3%80%81%E6%88%AA%E5%9B%BE%E5%B0%BA%E5%AF%B8/"/>
-    <id>http://yoursite.com/tags/2018-2-5-Android各大商店应用图标、截图尺寸/</id>
-    <published>2018-02-04T16:00:00.000Z</published>
-    <updated>2019-04-02T08:45:09.816Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="360"><a href="#360" class="headerlink" title="360"></a>360</h3><ul><li>应用图标：512 * 512png</li><li>应用截图：480 * 800 5张 png</li></ul><h3 id="百度"><a href="#百度" class="headerlink" title="百度"></a>百度</h3><ul><li>应用图标：512*512 png</li><li>应用截图：480 * 800 5张 </li></ul><h3 id="腾讯"><a href="#腾讯" class="headerlink" title="腾讯"></a>腾讯</h3><ul><li>应用图标：16 <em> 16一张，512 </em> 512一张 png</li><li>应用截图：480 * 800 5张 png</li></ul><h3 id="华为"><a href="#华为" class="headerlink" title="华为"></a>华为</h3><ul><li>应用图标：16 <em> 16一张，512 </em> 512一张 png</li><li>应用截图：480 * 800 5张 png</li></ul><h3 id="魅族"><a href="#魅族" class="headerlink" title="魅族"></a>魅族</h3><ul><li>应用图标：16 <em> 16一张，512 </em> 512一张 png</li><li>应用截图：480 * 800 5张 png</li></ul><h3 id="Oppo"><a href="#Oppo" class="headerlink" title="Oppo"></a>Oppo</h3><ul><li>应用图标：16 <em> 16一张，512 </em> 512一张 png</li><li>应用截图：480 * 800 5张 png</li></ul><h3 id="Vivo"><a href="#Vivo" class="headerlink" title="Vivo"></a>Vivo</h3><ul><li>应用图标：16 <em> 16一张，512 </em> 512一张 png</li><li>应用截图：480 * 800 5张 png</li></ul><h3 id="锤子"><a href="#锤子" class="headerlink" title="锤子"></a>锤子</h3><ul><li>应用图标：16 <em> 16一张，512 </em> 512一张 png</li><li>应用截图：480 * 800 5张 png</li></ul>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;360&quot;&gt;&lt;a href=&quot;#360&quot; class=&quot;headerlink&quot; title=&quot;360&quot;&gt;&lt;/a&gt;360&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;应用图标：512 * 512png&lt;/li&gt;
-&lt;li&gt;应用截图：480 * 800 5张 png&lt;/li&gt;
-&lt;/ul&gt;
-
-      
-    
-    </summary>
-    
-      <category term="Android" scheme="http://yoursite.com/categories/Android/"/>
-    
-    
-      <category term="Android" scheme="http://yoursite.com/tags/Android/"/>
+      <category term="Android" scheme="https:mubai.site/tags/Android/"/>
     
   </entry>
   
   <entry>
     <title>Android9.0曝光新特性</title>
-    <link href="http://yoursite.com/tags/2018-2-5-Android9.0%E6%9B%9D%E5%85%89%E6%96%B0%E7%89%B9%E6%80%A7/"/>
-    <id>http://yoursite.com/tags/2018-2-5-Android9.0曝光新特性/</id>
+    <link href="https:mubai.site/tags/2018-2-5-Android9.0%E6%9B%9D%E5%85%89%E6%96%B0%E7%89%B9%E6%80%A7/"/>
+    <id>https:mubai.site/tags/2018-2-5-Android9.0曝光新特性/</id>
     <published>2018-02-04T16:00:00.000Z</published>
     <updated>2019-04-02T08:45:03.196Z</updated>
     
@@ -189,17 +160,46 @@
     
     </summary>
     
-      <category term="Android" scheme="http://yoursite.com/categories/Android/"/>
+      <category term="Android" scheme="https:mubai.site/categories/Android/"/>
     
     
-      <category term="Android" scheme="http://yoursite.com/tags/Android/"/>
+      <category term="Android" scheme="https:mubai.site/tags/Android/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Android各大应用商店应用图标、截图尺寸</title>
+    <link href="https:mubai.site/tags/2018-2-5-Android%E5%90%84%E5%A4%A7%E5%95%86%E5%BA%97%E5%BA%94%E7%94%A8%E5%9B%BE%E6%A0%87%E3%80%81%E6%88%AA%E5%9B%BE%E5%B0%BA%E5%AF%B8/"/>
+    <id>https:mubai.site/tags/2018-2-5-Android各大商店应用图标、截图尺寸/</id>
+    <published>2018-02-04T16:00:00.000Z</published>
+    <updated>2019-04-02T08:45:09.816Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="360"><a href="#360" class="headerlink" title="360"></a>360</h3><ul><li>应用图标：512 * 512png</li><li>应用截图：480 * 800 5张 png</li></ul><h3 id="百度"><a href="#百度" class="headerlink" title="百度"></a>百度</h3><ul><li>应用图标：512*512 png</li><li>应用截图：480 * 800 5张 </li></ul><h3 id="腾讯"><a href="#腾讯" class="headerlink" title="腾讯"></a>腾讯</h3><ul><li>应用图标：16 <em> 16一张，512 </em> 512一张 png</li><li>应用截图：480 * 800 5张 png</li></ul><h3 id="华为"><a href="#华为" class="headerlink" title="华为"></a>华为</h3><ul><li>应用图标：16 <em> 16一张，512 </em> 512一张 png</li><li>应用截图：480 * 800 5张 png</li></ul><h3 id="魅族"><a href="#魅族" class="headerlink" title="魅族"></a>魅族</h3><ul><li>应用图标：16 <em> 16一张，512 </em> 512一张 png</li><li>应用截图：480 * 800 5张 png</li></ul><h3 id="Oppo"><a href="#Oppo" class="headerlink" title="Oppo"></a>Oppo</h3><ul><li>应用图标：16 <em> 16一张，512 </em> 512一张 png</li><li>应用截图：480 * 800 5张 png</li></ul><h3 id="Vivo"><a href="#Vivo" class="headerlink" title="Vivo"></a>Vivo</h3><ul><li>应用图标：16 <em> 16一张，512 </em> 512一张 png</li><li>应用截图：480 * 800 5张 png</li></ul><h3 id="锤子"><a href="#锤子" class="headerlink" title="锤子"></a>锤子</h3><ul><li>应用图标：16 <em> 16一张，512 </em> 512一张 png</li><li>应用截图：480 * 800 5张 png</li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;360&quot;&gt;&lt;a href=&quot;#360&quot; class=&quot;headerlink&quot; title=&quot;360&quot;&gt;&lt;/a&gt;360&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;应用图标：512 * 512png&lt;/li&gt;
+&lt;li&gt;应用截图：480 * 800 5张 png&lt;/li&gt;
+&lt;/ul&gt;
+
+      
+    
+    </summary>
+    
+      <category term="Android" scheme="https:mubai.site/categories/Android/"/>
+    
+    
+      <category term="Android" scheme="https:mubai.site/tags/Android/"/>
     
   </entry>
   
   <entry>
     <title>TensorFlow入门</title>
-    <link href="http://yoursite.com/tags/2018-2-3-TensorFlow%E5%85%A5%E9%97%A8/"/>
-    <id>http://yoursite.com/tags/2018-2-3-TensorFlow入门/</id>
+    <link href="https:mubai.site/tags/2018-2-3-TensorFlow%E5%85%A5%E9%97%A8/"/>
+    <id>https:mubai.site/tags/2018-2-3-TensorFlow入门/</id>
     <published>2018-02-02T16:00:00.000Z</published>
     <updated>2019-04-02T08:44:57.030Z</updated>
     
@@ -214,17 +214,17 @@
     
     </summary>
     
-      <category term="机器学习" scheme="http://yoursite.com/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
+      <category term="机器学习" scheme="https:mubai.site/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
     
     
-      <category term="机器学习" scheme="http://yoursite.com/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
+      <category term="机器学习" scheme="https:mubai.site/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
     
   </entry>
   
   <entry>
     <title>Android仓库托管平台</title>
-    <link href="http://yoursite.com/tags/2018-2-1-Android%E4%BB%93%E5%BA%93%E6%89%98%E7%AE%A1%E5%B9%B3%E5%8F%B0/"/>
-    <id>http://yoursite.com/tags/2018-2-1-Android仓库托管平台/</id>
+    <link href="https:mubai.site/tags/2018-2-1-Android%E4%BB%93%E5%BA%93%E6%89%98%E7%AE%A1%E5%B9%B3%E5%8F%B0/"/>
+    <id>https:mubai.site/tags/2018-2-1-Android仓库托管平台/</id>
     <published>2018-01-31T16:00:00.000Z</published>
     <updated>2019-04-02T08:44:51.394Z</updated>
     
@@ -239,17 +239,17 @@
     
     </summary>
     
-      <category term="Android" scheme="http://yoursite.com/categories/Android/"/>
+      <category term="Android" scheme="https:mubai.site/categories/Android/"/>
     
     
-      <category term="Android" scheme="http://yoursite.com/tags/Android/"/>
+      <category term="Android" scheme="https:mubai.site/tags/Android/"/>
     
   </entry>
   
   <entry>
     <title>项目发布到jcenter仓库</title>
-    <link href="http://yoursite.com/tags/2018-1-25-Jcenter%20/"/>
-    <id>http://yoursite.com/tags/2018-1-25-Jcenter /</id>
+    <link href="https:mubai.site/tags/2018-1-25-Jcenter%20/"/>
+    <id>https:mubai.site/tags/2018-1-25-Jcenter /</id>
     <published>2018-01-24T16:00:00.000Z</published>
     <updated>2019-04-02T08:44:47.888Z</updated>
     
@@ -264,17 +264,17 @@
     
     </summary>
     
-      <category term="Android" scheme="http://yoursite.com/categories/Android/"/>
+      <category term="Android" scheme="https:mubai.site/categories/Android/"/>
     
     
-      <category term="Android" scheme="http://yoursite.com/tags/Android/"/>
+      <category term="Android" scheme="https:mubai.site/tags/Android/"/>
     
   </entry>
   
   <entry>
     <title>Android反编译</title>
-    <link href="http://yoursite.com/tags/2018-1-18-%E5%8F%8D%E7%BC%96%E8%AF%91/"/>
-    <id>http://yoursite.com/tags/2018-1-18-反编译/</id>
+    <link href="https:mubai.site/tags/2018-1-18-%E5%8F%8D%E7%BC%96%E8%AF%91/"/>
+    <id>https:mubai.site/tags/2018-1-18-反编译/</id>
     <published>2018-01-17T16:00:00.000Z</published>
     <updated>2019-04-02T08:44:43.757Z</updated>
     
@@ -282,17 +282,17 @@
     
     </summary>
     
-      <category term="Android" scheme="http://yoursite.com/categories/Android/"/>
+      <category term="Android" scheme="https:mubai.site/categories/Android/"/>
     
     
-      <category term="Android" scheme="http://yoursite.com/tags/Android/"/>
+      <category term="Android" scheme="https:mubai.site/tags/Android/"/>
     
   </entry>
   
   <entry>
     <title>Android屏幕适配</title>
-    <link href="http://yoursite.com/tags/2018-1-11-Android%E5%B1%8F%E5%B9%95%E9%80%82%E9%85%8D/"/>
-    <id>http://yoursite.com/tags/2018-1-11-Android屏幕适配/</id>
+    <link href="https:mubai.site/tags/2018-1-11-Android%E5%B1%8F%E5%B9%95%E9%80%82%E9%85%8D/"/>
+    <id>https:mubai.site/tags/2018-1-11-Android屏幕适配/</id>
     <published>2018-01-10T16:00:00.000Z</published>
     <updated>2019-04-02T08:44:38.545Z</updated>
     
@@ -310,17 +310,17 @@
     
     </summary>
     
-      <category term="Android" scheme="http://yoursite.com/categories/Android/"/>
+      <category term="Android" scheme="https:mubai.site/categories/Android/"/>
     
     
-      <category term="Android" scheme="http://yoursite.com/tags/Android/"/>
+      <category term="Android" scheme="https:mubai.site/tags/Android/"/>
     
   </entry>
   
   <entry>
     <title>阿里云大使</title>
-    <link href="http://yoursite.com/tags/2018-1-10-%E9%98%BF%E9%87%8C%E4%BA%91%E5%A4%A7%E4%BD%BF%E8%A1%8C%E8%B5%B0%E4%B8%AD/"/>
-    <id>http://yoursite.com/tags/2018-1-10-阿里云大使行走中/</id>
+    <link href="https:mubai.site/tags/2018-1-10-%E9%98%BF%E9%87%8C%E4%BA%91%E5%A4%A7%E4%BD%BF%E8%A1%8C%E8%B5%B0%E4%B8%AD/"/>
+    <id>https:mubai.site/tags/2018-1-10-阿里云大使行走中/</id>
     <published>2018-01-09T16:00:00.000Z</published>
     <updated>2019-04-02T08:44:30.526Z</updated>
     
@@ -338,17 +338,17 @@
     
     </summary>
     
-      <category term="闲文" scheme="http://yoursite.com/categories/%E9%97%B2%E6%96%87/"/>
+      <category term="闲文" scheme="https:mubai.site/categories/%E9%97%B2%E6%96%87/"/>
     
     
-      <category term="闲文" scheme="http://yoursite.com/tags/%E9%97%B2%E6%96%87/"/>
+      <category term="闲文" scheme="https:mubai.site/tags/%E9%97%B2%E6%96%87/"/>
     
   </entry>
   
   <entry>
     <title>谈谈Android中的JNI和NDK</title>
-    <link href="http://yoursite.com/tags/2018-1-9-Android%20JNI%E5%92%8CNDK/"/>
-    <id>http://yoursite.com/tags/2018-1-9-Android JNI和NDK/</id>
+    <link href="https:mubai.site/tags/2018-1-9-Android%20JNI%E5%92%8CNDK/"/>
+    <id>https:mubai.site/tags/2018-1-9-Android JNI和NDK/</id>
     <published>2018-01-08T16:00:00.000Z</published>
     <updated>2019-04-02T08:44:24.362Z</updated>
     
@@ -366,17 +366,17 @@
     
     </summary>
     
-      <category term="Android" scheme="http://yoursite.com/categories/Android/"/>
+      <category term="Android" scheme="https:mubai.site/categories/Android/"/>
     
     
-      <category term="Android" scheme="http://yoursite.com/tags/Android/"/>
+      <category term="Android" scheme="https:mubai.site/tags/Android/"/>
     
   </entry>
   
   <entry>
     <title>从比特币中浅谈区块链技术</title>
-    <link href="http://yoursite.com/tags/2018-1-5-%E6%B5%85%E8%B0%88%E5%8C%BA%E5%9D%97%E9%93%BE%E6%8A%80%E6%9C%AF/"/>
-    <id>http://yoursite.com/tags/2018-1-5-浅谈区块链技术/</id>
+    <link href="https:mubai.site/tags/2018-1-5-%E6%B5%85%E8%B0%88%E5%8C%BA%E5%9D%97%E9%93%BE%E6%8A%80%E6%9C%AF/"/>
+    <id>https:mubai.site/tags/2018-1-5-浅谈区块链技术/</id>
     <published>2018-01-04T16:00:00.000Z</published>
     <updated>2019-04-02T08:44:14.574Z</updated>
     
@@ -393,17 +393,17 @@
     
     </summary>
     
-      <category term="闲文" scheme="http://yoursite.com/categories/%E9%97%B2%E6%96%87/"/>
+      <category term="闲文" scheme="https:mubai.site/categories/%E9%97%B2%E6%96%87/"/>
     
     
-      <category term="闲文" scheme="http://yoursite.com/tags/%E9%97%B2%E6%96%87/"/>
+      <category term="闲文" scheme="https:mubai.site/tags/%E9%97%B2%E6%96%87/"/>
     
   </entry>
   
   <entry>
     <title>AttachInfo的初步了解和解析</title>
-    <link href="http://yoursite.com/tags/2017-12-30-AttachInfo%E7%9A%84%E5%88%9D%E6%AD%A5%E4%BA%86%E8%A7%A3%E5%92%8C%E8%A7%A3%E6%9E%90/"/>
-    <id>http://yoursite.com/tags/2017-12-30-AttachInfo的初步了解和解析/</id>
+    <link href="https:mubai.site/tags/2017-12-30-AttachInfo%E7%9A%84%E5%88%9D%E6%AD%A5%E4%BA%86%E8%A7%A3%E5%92%8C%E8%A7%A3%E6%9E%90/"/>
+    <id>https:mubai.site/tags/2017-12-30-AttachInfo的初步了解和解析/</id>
     <published>2017-12-29T16:00:00.000Z</published>
     <updated>2019-04-02T08:44:07.471Z</updated>
     
@@ -418,17 +418,17 @@
     
     </summary>
     
-      <category term="Android" scheme="http://yoursite.com/categories/Android/"/>
+      <category term="Android" scheme="https:mubai.site/categories/Android/"/>
     
     
-      <category term="Android" scheme="http://yoursite.com/tags/Android/"/>
+      <category term="Android" scheme="https:mubai.site/tags/Android/"/>
     
   </entry>
   
   <entry>
     <title>从项目需求到PopupWindow在到Window的过程浅析</title>
-    <link href="http://yoursite.com/tags/2017-12-27-%E4%BB%8EPopupWindow%E5%88%B0Window%E7%9A%84%E8%BF%87%E7%A8%8B%E6%B5%85%E6%9E%90/"/>
-    <id>http://yoursite.com/tags/2017-12-27-从PopupWindow到Window的过程浅析/</id>
+    <link href="https:mubai.site/tags/2017-12-27-%E4%BB%8EPopupWindow%E5%88%B0Window%E7%9A%84%E8%BF%87%E7%A8%8B%E6%B5%85%E6%9E%90/"/>
+    <id>https:mubai.site/tags/2017-12-27-从PopupWindow到Window的过程浅析/</id>
     <published>2017-12-26T16:00:00.000Z</published>
     <updated>2019-04-02T08:44:02.739Z</updated>
     
@@ -444,17 +444,17 @@
     
     </summary>
     
-      <category term="Android" scheme="http://yoursite.com/categories/Android/"/>
+      <category term="Android" scheme="https:mubai.site/categories/Android/"/>
     
     
-      <category term="Android" scheme="http://yoursite.com/tags/Android/"/>
+      <category term="Android" scheme="https:mubai.site/tags/Android/"/>
     
   </entry>
   
   <entry>
     <title>LeakCancary的使用和原理</title>
-    <link href="http://yoursite.com/tags/2017-12-23-LeakCancary%E7%9A%84%E4%BD%BF%E7%94%A8%E5%92%8C%E5%8E%9F%E7%90%86/"/>
-    <id>http://yoursite.com/tags/2017-12-23-LeakCancary的使用和原理/</id>
+    <link href="https:mubai.site/tags/2017-12-23-LeakCancary%E7%9A%84%E4%BD%BF%E7%94%A8%E5%92%8C%E5%8E%9F%E7%90%86/"/>
+    <id>https:mubai.site/tags/2017-12-23-LeakCancary的使用和原理/</id>
     <published>2017-12-22T16:00:00.000Z</published>
     <updated>2019-04-02T08:43:56.545Z</updated>
     
@@ -471,17 +471,17 @@
     
     </summary>
     
-      <category term="Android" scheme="http://yoursite.com/categories/Android/"/>
+      <category term="Android" scheme="https:mubai.site/categories/Android/"/>
     
     
-      <category term="Android" scheme="http://yoursite.com/tags/Android/"/>
+      <category term="Android" scheme="https:mubai.site/tags/Android/"/>
     
   </entry>
   
   <entry>
     <title>2017年年度总结+2018年目标展望</title>
-    <link href="http://yoursite.com/tags/2017-12-22-2017%E5%B9%B4%E5%B9%B4%E5%BA%A6%E6%80%BB%E7%BB%93/"/>
-    <id>http://yoursite.com/tags/2017-12-22-2017年年度总结/</id>
+    <link href="https:mubai.site/tags/2017-12-22-2017%E5%B9%B4%E5%B9%B4%E5%BA%A6%E6%80%BB%E7%BB%93/"/>
+    <id>https:mubai.site/tags/2017-12-22-2017年年度总结/</id>
     <published>2017-12-21T16:00:00.000Z</published>
     <updated>2019-04-02T08:43:50.914Z</updated>
     
@@ -500,17 +500,17 @@
     
     </summary>
     
-      <category term="总结" scheme="http://yoursite.com/categories/%E6%80%BB%E7%BB%93/"/>
+      <category term="总结" scheme="https:mubai.site/categories/%E6%80%BB%E7%BB%93/"/>
     
     
-      <category term="总结" scheme="http://yoursite.com/tags/%E6%80%BB%E7%BB%93/"/>
+      <category term="总结" scheme="https:mubai.site/tags/%E6%80%BB%E7%BB%93/"/>
     
   </entry>
   
   <entry>
     <title>安卓的进程保活</title>
-    <link href="http://yoursite.com/tags/2017-12-21-%E8%BF%9B%E7%A8%8B%E4%BF%9D%E6%B4%BB/"/>
-    <id>http://yoursite.com/tags/2017-12-21-进程保活/</id>
+    <link href="https:mubai.site/tags/2017-12-21-%E8%BF%9B%E7%A8%8B%E4%BF%9D%E6%B4%BB/"/>
+    <id>https:mubai.site/tags/2017-12-21-进程保活/</id>
     <published>2017-12-20T16:00:00.000Z</published>
     <updated>2019-04-02T08:43:43.579Z</updated>
     
@@ -528,10 +528,10 @@
     
     </summary>
     
-      <category term="Android" scheme="http://yoursite.com/categories/Android/"/>
+      <category term="Android" scheme="https:mubai.site/categories/Android/"/>
     
     
-      <category term="Android" scheme="http://yoursite.com/tags/Android/"/>
+      <category term="Android" scheme="https:mubai.site/tags/Android/"/>
     
   </entry>
   
