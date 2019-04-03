@@ -1,0 +1,148 @@
+<!DOCTYPE html><html lang="null"><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description"><title>LeakCancary的使用和原理 | Hexo</title><link rel="stylesheet" type="text/css" href="//fonts.loli.net/css?family=Source+Code+Pro"><link rel="stylesheet" type="text/css" href="/css/style.css?v=2.0.3"><link rel="stylesheet" type="text/css" href="/css/highlight.css?v=2.0.3"><link rel="Shortcut Icon" href="/favicon.ico"><link rel="bookmark" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/atom.xml"><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css?v=2.0.3"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js?v=2.0.3"></script><script src="//cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.js?v=2.0.3"></script></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">LeakCancary的使用和原理</h1><a id="logo" href="/.">Hexo</a><p class="description"></p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> Start</i></a><a href="/archives/"><i class="fa fa-archive"> Archiv</i></a><a href="/about/"><i class="fa fa-user"> Über</i></a><a href="/atom.xml"><i class="fa fa-rss"> RSS</i></a></div><div id="search-form"><div id="result-mask" class="hide"></div><label><input id="search-key" type="text" autocomplete="off" placeholder="Suche"></label><div id="result-wrap" class="hide"><div id="search-result"></div></div><div class="hide"><template id="search-tpl"><div class="item"><a href="/{path}" title="{title}"><div class="title">{title}</div><div class="time">{date}</div><div class="tags">{tags}</div></a></div></template></div></div></div><div id="layout" class="layout-g"><div class="layout-l"><div class="content_container"><div class="post"><h1 class="post-title">LeakCancary的使用和原理</h1><div class="post-meta"><a href="/2017/12/23/2017-12-23-LeakCancary的使用和原理/#comments" class="comment-count"></a><p><span class="date">Dec 23, 2017</span><span><a href="/categories/Android/" class="category">Android</a></span><span><i id="busuanzi_container_page_pv"><i id="busuanzi_value_page_pv"></i><i>Schlägt</i></i></span></p></div><div class="post-content"><h3 id="目录："><a href="#目录：" class="headerlink" title="目录："></a>目录：</h3><ul>
+<li>为什么会有<em>LeakCancary</em></li>
+<li>什么是<em>LeakCancary</em></li>
+<li><em>LeakCancary</em>的使用</li>
+<li><em>LeakCancary</em>的实现过程</li>
+</ul>
+<hr>
+<h4 id="Why-LeakCancary"><a href="#Why-LeakCancary" class="headerlink" title="Why LeakCancary"></a>Why LeakCancary</h4><blockquote>
+<p><strong>Square</strong>在开源项目<strong>LeakCancary</strong>的前言就提到了</p>
+<p><strong>“A small leak will sink a great ship”</strong></p>
+<p>我们可以翻译过来用一句名言来表示：<br><strong>“千里之堤溃于蚁穴”</strong></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">java.lang.OutOfMemoryError</span><br><span class="line">        at android.graphics.Bitmap.nativeCreate(Bitmap.java:-2)</span><br><span class="line">        at android.graphics.Bitmap.createBitmap(Bitmap.java:689)</span><br><span class="line">        at com.squareup.ui.SignView.createSignatureBitmap(SignView.java:121)</span><br></pre></td></tr></table></figure>
+<p><strong>OOM</strong> 项目中最让人头疼的一个异常，它不像一些其他异常很显示的给你指出并且容易解决，它的产生原因一般都是内存对象的不正确使用导致GC无法正常的回收对象，进而产生内存泄露，让系统的内存空间逐渐的不够，然后导致内存溢出。</p>
+<p><strong>Square</strong>公司有篇文章说过他们在使用Bitmap进行签名页面进行绘制过程中，创建的bitmap对象经常性的产生OOM。<br>为了解决这个问题，<strong>Square</strong>做出了很多的对策，包括：</p>
+<ul>
+<li>使用<strong>Bitmap.Config.ALPHA_8</strong>节省内存</li>
+<li>手动捕获<strong>OOM</strong>，调用<strong>GC</strong></li>
+</ul>
+<p>但是实际上效果并不好，后来他们发现是方向错了，当系统中分配的内存已经不够了，这时候OOM可以发生在任何的地方，特别是一些大对象的使用，比如Bitmap的创建。OOM只是表象，更深层次的问题可能是：<strong>内存泄露</strong></p>
+<p>但是在原来的时候排查内存泄露是个全手工的过程,为了解决这个问题，<strong>LeakCancary</strong>出现了。</p>
+<h4 id="What-LeakCancary"><a href="#What-LeakCancary" class="headerlink" title="What LeakCancary"></a>What LeakCancary</h4><p><strong><a href="https://github.com/square/leakcanary" target="_blank" rel="noopener">LeakCancary</a></strong>是<strong>Square</strong>公司推出的一款Java和Android内存泄露检查框架，如果检测到某个地方产生了内存泄露，LeakCancary会生成一个显示的通知，并且在Locat会有相应的log日志提醒，通过显示的通知和log日志我们可以对内存泄露进行准确的定位并去解决它。</p>
+<h4 id="Use-LeakCancary"><a href="#Use-LeakCancary" class="headerlink" title="Use LeakCancary"></a>Use LeakCancary</h4><p><img src="http://p0sgkjh7x.bkt.clouddn.com/374F4D1C-CDAA-4FA1-BD09-1EFEE81C4B81.png" alt="LeakCancary显示通知图"></p>
+<p><em>LeakCancary显示通知图镇楼</em></p>
+<p>关于<strong>LeakCancary</strong>的开源和使用，Square最初的目的是为了能更好的对app进行内存泄露的检测，而且是为了能更简的入手，所以它的使用就不会很复杂，实际上用法也是很简单：</p>
+<ul>
+<li>在build.gradle添加引用：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">debugCompile &apos;com.squareup.leakcanary:leakcanary-android:1.5.4&apos;</span><br><span class="line">releaseCompile &apos;com.squareup.leakcanary:leakcanary-android-no-op:1.5.4&apos;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>当前最新版本为1.5.4，可以根据git上的最新版本进行升级</p>
+</blockquote>
+<ul>
+<li>在<strong>自定义继承Application</strong>中添加<strong>RefWatcher</strong></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public class Ys7App extends Application &#123;</span><br><span class="line"></span><br><span class="line"> 	 /**</span><br><span class="line"> 	  * RefWatcher对象</span><br><span class="line"> 	  */</span><br><span class="line">    private RefWatcher refWatcher;</span><br><span class="line"></span><br><span class="line">    public static RefWatcher getRefWatcher(Context context) &#123;</span><br><span class="line">        Ys7App application = (Ys7App) context.getApplicationContext();</span><br><span class="line">        return application.refWatcher;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void onCreate() &#123;</span><br><span class="line">        super.onCreate();</span><br><span class="line">        refWatcher = LeakCanary.install(this);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>不要忘记把自定义继承的<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">然后我们就可以去写**内存泄露**了(咳咳，说错了，是去发现内存泄露)</span><br><span class="line"></span><br><span class="line">说个很常见的内存泄露问题：*关于Context对象的使用*</span><br><span class="line"></span><br><span class="line">项目中很多地方都需要用到**Context**对象,有时候我们会直接使用**Activity**的**Context**对象，有时候会使用全局的**Context**对象。关于这个我们要说说关于在**Activity**中使用单例模式的问题，很多时候我们需要去维护一个全局的方法，很容易想到用单例模式，它也是设计模式中最简单易懂的一个，但是它如果使用不好就会产生**内存泄露**问题。</span><br><span class="line"></span><br><span class="line">* TextView的一个单例实现类</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>public class TextHelper {<br>    private static TextHelper mTextHelper;<br>    private Context mContext;<br>    private TextView mTextView;</p>
+<pre><code>private TextHelper(Context context) {
+    this.mContext = context;
+}
+
+public static TextHelper getTextHelper(Context context) {
+    if (null == mTextHelper) {
+        mTextHelper = new TextHelper(context);
+    }
+    return mTextHelper;
+}
+
+/**
+ * 设置TextView的大小和颜色
+ *
+ * @param textView
+ */
+@SuppressLint(&quot;NewApi&quot;)
+public void setText(TextView textView) {
+    this.mTextView = textView;
+    this.mTextView.setTextSize(20f);
+    this.mTextView.setTextColor(mContext.getColor(R.color.black));
+}
+</code></pre><p>}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; 这里因为我们需要引用到资源文件中的color文件，所以需要个**Context**对象</span><br><span class="line"></span><br><span class="line">* 在Activity中使用：</span><br></pre></td></tr></table></figure>
+<p> TextHelper.getTextHelper(SDKActivity.this).setText(nameText);</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&gt; 这里我们使用了当前**Activity**的**Context**对象</span><br><span class="line"></span><br><span class="line">这里因为在**Activity**中使用了当前的**Context**对象，看上去没什么问题，但是如果我们退出当前Activity后(引入了**LeakCancary**的前提)，会在通知栏看到产生了个内存泄露通知</span><br><span class="line"></span><br><span class="line">&lt;img src=&quot;http://p0sgkjh7x.bkt.clouddn.com/D879CC01A4E508F2835F89036A03A0A6.jpg&quot; height=&quot;250&quot; width=&quot;150&quot;/&gt;</span><br><span class="line"></span><br><span class="line">然后我们通过查看**Leaks**中的列表问题</span><br><span class="line"></span><br><span class="line">&lt;img src=&quot;http://p0sgkjh7x.bkt.clouddn.com/F6A127ED4F1BAA1DFD5CE4F6B3C8012A.jpg&quot; height=&quot;250&quot; width=&quot;150&quot;/&gt;</span><br><span class="line"></span><br><span class="line">&gt; Leaks:由于App运行中产生了内存泄露然后显示在手机上，在这边是一个内存泄露的问题列表，然后我们可以通过查看每一项进行问题的查看</span><br><span class="line"></span><br><span class="line">&lt;img src=&quot;http://p0sgkjh7x.bkt.clouddn.com/94088C38003714DBF648267A164FF6B4.jpg&quot; height=&quot;250 &quot; width=&quot;150&quot; /&gt;</span><br><span class="line"></span><br><span class="line">这边就是我们通过leaked5.8查看的具体问题，可以看到Leaks已经帮我们把内存泄露的地方指出来了，这是因为我们的**Activity**在退出后它的**Context**对象被单例模式中的方法持有 着，但是**Activity**已经不存在了，这里就产生了内存泄露。</span><br><span class="line">&gt; 实际上这是个很简单但是又很容易犯的问题</span><br><span class="line">&gt; </span><br><span class="line">&gt; 同时我们也可以通过点击Leaks边上的**+**来进行更多信息的查看</span><br><span class="line"></span><br><span class="line">所以我们这里的话要解决这个内存泄露就要传入一个全局的**Context**对象</span><br></pre></td></tr></table></figure>
+<p>TextHelper.getTextHelper(Application.getInstance()).setText(nameText);</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">或者是直接在单例模式中直接获取全局的**Context**对象</span><br></pre></td></tr></table></figure>
+<p>public class TextHelper {<br>    private static TextHelper mTextHelper;<br>    private Context mContext;<br>    private TextView mTextView;</p>
+<pre><code>private TextHelper(Context context) {
+    this.mContext = Application.getInstance();
+}
+
+public static TextHelper getTextHelper() {
+    if (null == mTextHelper) {
+        mTextHelper = new TextHelper();
+    }
+    return mTextHelper;
+}
+
+/**
+ * 设置TextView的大小和颜色
+ *
+ * @param textView
+ */
+@SuppressLint(&quot;NewApi&quot;)
+public void setText(TextView textView) {
+    this.mTextView = textView;
+    this.mTextView.setTextSize(20f);
+    this.mTextView.setTextColor(mContext.getColor(R.color.black));
+}
+</code></pre><p>}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">这里就能避免由于**Context**对象的被持有导致的**内存泄露**。</span><br><span class="line"></span><br><span class="line">&gt; 实际上我们项目开发过程中会或多或少的产生**内存泄露**，这里只是举了一个简单的例子，我们只能通过去发现然后排查解决。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#### Behind LeakCancary</span><br><span class="line">&gt; 在使用框架的同时也要关注下背后的实现过程和原理</span><br><span class="line">&gt; 我们通过对源码进行一步步的分解</span><br><span class="line"></span><br><span class="line">* 返回**RefWatcher**的过程</span><br></pre></td></tr></table></figure>
+<p>private RefWatcher refWatcher;<br>refWatcher = LeakCanary.install(this);</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; 通过**install()**方法</span><br></pre></td></tr></table></figure>
+<p>public static RefWatcher install(Application application) {<br>        return ((AndroidRefWatcherBuilder)refWatcher(application).listenerServiceClass(DisplayLeakService.class).excludedRefs(AndroidExcludedRefs.createAppDefaults().build())).buildAndInstall();<br>    }</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; 继续对**buildAndInstall()**进行分析</span><br></pre></td></tr></table></figure>
+<p>public RefWatcher buildAndInstall() {<br>        RefWatcher refWatcher = this.build();<br>        if(refWatcher != RefWatcher.DISABLED) {<br>            LeakCanary.enableDisplayLeakActivity(this.context);<br>            ActivityRefWatcher.install((Application)this.context, refWatcher);<br>        }</p>
+<pre><code>    return refWatcher;
+}
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; 在这里会返回一个**AndroidRefWatcher**，所以我们在对**Activity**进行内存泄露检查的时候，不需要专门添加代码，这里的**AndroidRefWatcher**会自动的帮我们进行检查</span><br></pre></td></tr></table></figure>
+<p>public final class ActivityRefWatcher {<br>    private final ActivityLifecycleCallbacks lifecycleCallbacks = new ActivityLifecycleCallbacks() {<br>        public void onActivityCreated(Activity activity, Bundle savedInstanceState) {<br>        }</p>
+<pre><code>    public void onActivityStarted(Activity activity) {
+    }
+
+    public void onActivityResumed(Activity activity) {
+    }
+
+    public void onActivityPaused(Activity activity) {
+    }
+
+    public void onActivityStopped(Activity activity) {
+    }
+
+    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+    }
+
+    public void onActivityDestroyed(Activity activity) {
+      //调用ActivityRefWatcher的watch方法
+       ActivityRefWatcher.this.onActivityDestroyed(activity);
+    }
+};
+</code></pre><p>}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; 在**ActivityRefWatcher**中我们发现会有关于**Activity**生命周期的回调监听并且在**onDestroy()**中会去添加**ActivityRefWatcher**的**watch**方法，但是这里也需要注意的是**registerActivityLifecycleCallbacks()**是在Api14以后才添加的方法，所以如果要在Api14以前检测就需要自己去重写onDestory并在里面添加RefWatcher.watch()方法</span><br><span class="line"></span><br><span class="line">如果是在**Fragment**中需要检查内存泄露情况的话需要我们自己实现**RefWatcher**的**watch**方法</span><br></pre></td></tr></table></figure>
+<p>public class BaseFragment extends Fragment {</p>
+<pre><code>@Override
+public void onDestroy() {
+    super.onDestroy();
+    //返回一个RefWatcher对象
+    RefWatcher refWatcher = Ys7App.getRefWatcher(getActivity());
+    refWatcher.watch(this);
+}
+</code></pre><p>}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt; 在这里有个疑问，为什么**Square**公司在设计**LeakCancary**的时候，考虑到了**Activity**，添加了对应的**ActivityRefWatcher**，但是对于碎片**Fragment**并没有去设计对应的**FragmentRefWatcher**方法,不知道是因为Fragment的生命周期过多还是其他的原因，也许我们可以自己根据**ActivityRefWatcher**的实现方法设计一套自己的**FragmentRefWatcher**，先留个想法...</span><br><span class="line"></span><br><span class="line">* RefWatcher是如何能够对内存泄露进行检测的</span><br><span class="line"></span><br><span class="line">通过观察RefWatcher的watch()方法</span><br></pre></td></tr></table></figure>
+<p>public void watch(Object watchedReference, String referenceName) {<br>if(this != DISABLED) {<br>…<br>long watchStartNanoTime = System.nanoTime();<br>String key = UUID.randomUUID().toString();<br>this.retainedKeys.add(key);<br>//创建一个KeyedWeakReference弱引用对象<br>KeyedWeakReference reference = new KeyedWeakReference(watchedReference, key, referenceName, this.queue);<br>this.ensureGoneAsync(watchStartNanoTime, reference);<br>}<br>}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">这里创建了一个**KeyedWeakReference**对象，这是个弱引用的对象</span><br></pre></td></tr></table></figure>
+<p>private void ensureGoneAsync(final long watchStartNanoTime, final KeyedWeakReference reference) {<br>//执行操作，检查弱引用对象是否被清除<br>this.watchExecutor.execute(new Retryable() {<br>    public Result run() {<br>        return RefWatcher.this.ensureGone(reference, watchStartNanoTime);<br>    }<br>});<br>}</p>
+<p>Result ensureGone(KeyedWeakReference reference, long watchStartNanoTime) {<br>…<br>if(this.debuggerControl.isDebuggerAttached()) {<br>    return Result.RETRY;<br>} else if(this.gone(reference)) {<br>    return Result.DONE;<br>} else {<br>    //手动调用GC<br>    this.gcTrigger.runGc();<br>    this.removeWeaklyReachableReferences();<br>    //如果弱引用对象还存在，则说明内存泄露了，生成hprof文件<br>     if(!this.gone(reference)) {<br>                File heapDumpFile = this.heapDumper.dumpHeap();<br>                …<br>                this.heapdumpListener.analyze(new HeapDump(heapDumpFile, reference.key, reference.name, this.excludedRefs, watchDurationMs, gcDurationMs, heapDumpDurationMs));<br>            }<br>     }<br>    return Result.DONE;<br>}<br>//retainedKeys中是否包含弱引用对象的key<br>private boolean gone(KeyedWeakReference reference) {<br>        return !this.retainedKeys.contains(reference.key);<br>    }<br>}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">在**WatchExector**的后台线程中执行检查弱引用对象是否被清除，如果没有清除，则调用一次GC，(这边能够检查弱引用对象还是根据**KeyedWeakReference**是以key-value形式存在的对象)</span><br><span class="line">如果弱引用对象没有被清除，则说明内存泄露了，系统就导出hprof文件,保存在app系统目录下</span><br></pre></td></tr></table></figure>
+<p>final class KeyedWeakReference extends WeakReference<object> {<br>        //key-value形式存在<br>    public final String key;<br>    public final String name;</object></p>
+<pre><code>KeyedWeakReference(Object referent, String key, String name, ReferenceQueue&lt;Object&gt; referenceQueue) {
+    super(Preconditions.checkNotNull(referent, &quot;referent&quot;), 
+    ...
+</code></pre><p>}</p>
+<p><code>`</code></p>
+<hr>
+<h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><p>根据<strong>Square</strong>公司的数据说明他们在使用了<strong>LeakCancary</strong>后，减少了<strong>94%</strong>由OOM导致的cash。</p>
+</div><div class="post-copyright"><blockquote><p>Ursprünglicher Autor: John Doe</p><p>Ursprünglicher Link: <a href="http://yoursite.com/2017/12/23/2017-12-23-LeakCancary的使用和原理/">http://yoursite.com/2017/12/23/2017-12-23-LeakCancary的使用和原理/</a></p><p>Copyright-Erklärung: Bitte geben Sie die Quelle des Nachdrucks an.</p></blockquote></div><div class="tags"><a href="/tags/Android/">Android</a></div><div class="post-share"><div class="social-share"><span>Aktie:</span></div></div><div class="post-nav"><a href="/2017/12/27/2017-12-27-从PopupWindow到Window的过程浅析/" class="pre">从项目需求到PopupWindow在到Window的过程浅析</a><a href="/2017/12/22/2017-12-22-2017年年度总结/" class="next">2017年年度总结+2018年目标展望</a></div><div id="comments"></div></div></div></div><div class="layout-r"><div id="sidebar"><div class="search-pla"></div><div id="toc" class="widget"><div class="widget-title"><i class="fa fa-fei">Inhalte</i></div><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#目录："><span class="toc-text">目录：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Why-LeakCancary"><span class="toc-text">Why LeakCancary</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#What-LeakCancary"><span class="toc-text">What LeakCancary</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Use-LeakCancary"><span class="toc-text">Use LeakCancary</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#结论"><span class="toc-text">结论</span></a></li></ol></div><div class="widget"><div class="widget-title"><i class="fa fa-xie"> Letzte</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2019/03/31/2019-3-31-5.1旅游攻略/">5.1节日旅游攻略</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/02/20/Me/">Me</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/10/09/2018-10-9-物联网通信-WiFi:BT:ZigBee芯片级方案解析/">物联网通信-WiFi/BT/ZigBee芯片级方案解析</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/12/2018-7-12-Nexus+Maven搭建私有库/">Nexus+Maven搭建私有库</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/26/2018-2-26-Android Gradle 中遇到的问题/">Android Gradle</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/05/2018-2-5-Android各大商店应用图标、截图尺寸/">Android各大应用商店应用图标、截图尺寸</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/05/2018-2-5-Android9.0曝光新特性/">Android9.0曝光新特性</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/03/2018-2-3-TensorFlow入门/">TensorFlow入门</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/01/2018-2-1-Android仓库托管平台/">Android仓库托管平台</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/01/25/2018-1-25-Jcenter /">项目发布到jcenter仓库</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-gui"> Kategorien</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a><span class="category-list-count">17</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/开发规范/">开发规范</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/总结/">总结</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/机器学习/">机器学习</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构/">架构</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/物联网/">物联网</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/算法/">算法</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/闲文/">闲文</a><span class="category-list-count">4</span></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-biao"> Tags</i></div><div class="tagcloud"><a href="/tags/总结/" style="font-size: 15px;">总结</a> <a href="/tags/开发规范/" style="font-size: 15px;">开发规范</a> <a href="/tags/闲文/" style="font-size: 15px;">闲文</a> <a href="/tags/算法/" style="font-size: 15px;">算法</a> <a href="/tags/架构/" style="font-size: 15px;">架构</a> <a href="/tags/Android/" style="font-size: 15px;">Android</a> <a href="/tags/设计模式/" style="font-size: 15px;">设计模式</a> <a href="/tags/物联网/" style="font-size: 15px;">物联网</a> <a href="/tags/机器学习/" style="font-size: 15px;">机器学习</a> <a href="/tags/简历/" style="font-size: 15px;">简历</a> <a href="/tags/Maven/" style="font-size: 15px;">Maven</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-archive"> Archiv</i></div><ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-you"> Blogroll</i></div><ul></ul><a href="https://juejin.im/" title="掘金" target="_blank">掘金</a><ul></ul><a href="https://www.wanandroid.com/" title="玩安卓" target="_blank">玩安卓</a><ul></ul><a href="https://www.simon96.online/2018/10/12/hexo-tutorial/" title="遇见西门" target="_blank">遇见西门</a></div></div></div></div><a id="totop" href="#top"></a><div id="footer"><div class="footer-info"><p><a href="/baidusitemap.xml">Sitemap</a> |  <a href="/atom.xml">Abonnieren Sie diese Site</a> |  <a href="/about/">Kontaktieren Sie den Blogger</a></p><p>本站总访问量：<i id="busuanzi_container_site_pv"><i id="busuanzi_value_site_pv"></i></i>次，本站总访客数:<i id="busuanzi_container_site_uv"><i id="busuanzi_value_site_uv"></i></i>人</p><p><span> Copyright &copy;<a href="/." rel="nofollow">John Doe.</a></span><span> Theme by<a rel="nofollow" target="_blank" href="https://github.com/chaooo/hexo-theme-BlueLake"> BlueLake.</a></span><span> Count by<a href="http://busuanzi.ibruce.info/"> busuanzi.</a></span><span> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a></span></p></div></div></div><script src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script><script type="text/javascript" src="/js/search.json.js?v=2.0.3"></script><script type="text/javascript" src="/js/toctotop.js?v=2.0.3" async></script><link rel="stylesheet" type="text/css" href="/share/css/share.css"><script type="text/javascript" src="/share/js/social-share.js" charset="utf-8"></script><script type="text/javascript" src="/share/js/qrcode.js" charset="utf-8"></script></body></html>
