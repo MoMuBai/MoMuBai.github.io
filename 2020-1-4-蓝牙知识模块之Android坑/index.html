@@ -1,0 +1,107 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="搬砖的"><title>蓝牙知识模块之Android坑 | 沐白白白</title><link rel="stylesheet" type="text/css" href="//fonts.loli.net/css?family=Source+Code+Pro"><link rel="stylesheet" type="text/css" href="/css/style.css?v=2.0.3"><link rel="stylesheet" type="text/css" href="/css/highlight.css?v=2.0.3"><link rel="Shortcut Icon" href="/favicon.ico"><link rel="bookmark" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/atom.xml"><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css?v=2.0.3"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js?v=2.0.3"></script><script src="//cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.js?v=2.0.3"></script></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">蓝牙知识模块之Android坑</h1><a id="logo" href="/.">沐白白白</a><p class="description"></p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="https://github.com/MoMuBai/DailyQA"><i class="fa fa-dailyQA"> DailyQA</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div><div id="search-form"><div id="result-mask" class="hide"></div><label><input id="search-key" type="text" autocomplete="off" placeholder="搜索"></label><div id="result-wrap" class="hide"><div id="search-result"></div></div><div class="hide"><template id="search-tpl"><div class="item"><a href="/{path}" title="{title}"><div class="title">{title}</div><div class="time">{date}</div><div class="tags">{tags}</div></a></div></template></div></div></div><div id="layout" class="layout-g"><div class="layout-l"><div class="content_container"><div class="post"><h1 class="post-title">蓝牙知识模块之Android坑</h1><div class="post-meta"><a href="/2020-1-4-蓝牙知识模块之Android坑/#comments" class="comment-count"></a><p><span class="date">Jan 04, 2020</span><span><a href="/categories/Android/" class="category">Android</a></span><span><i id="busuanzi_container_page_pv"><i id="busuanzi_value_page_pv"></i><i>点击</i></i></span></p></div><div class="post-content"><p> <em>蓝牙知识模块之Android应用</em></p>
+<h3 id="一、Android蓝牙4-0-BLE开发坑总结"><a href="#一、Android蓝牙4-0-BLE开发坑总结" class="headerlink" title="一、Android蓝牙4.0 BLE开发坑总结:"></a>一、Android蓝牙4.0 BLE开发坑总结:</h3><ul>
+<li><p>1.onServicesDiscovered 回调里不能直接执行 write /readDataFromCharacteristic() 或者 enableNotificationOfCharacteristic之类的，而要放到主线程里执行，如 handler.post( … );</p>
+</li>
+<li><p>2.如果发现连接上了，service也discover到了，但是始终不能触发onCharacteristicChanged的，一定要查找如下2个重要原因：<br>1). 一定要gatt.setCharacteristicNotification(characteristic, enable);<br>2). 如果设置了1).却还是发现没有触发，这个时候比较坑爹了，加上对此Characteristic的descriptor做indication Enable就应该可以了;</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">for(BluetoothGattDescriptor dp:characteristic().getDescriptors()) &#123;</span><br><span class="line">dp.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);</span><br><span class="line">mBluetoothGatt().writeDescriptor(dp);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>3.不同的机型的discoverService到onServiceDiscovered之间的耗时长短不一，这会导致一个问题：如果蓝牙硬件设备支持离线传输，即有记忆功能，连接上之后多久发送之前的数据的问题。如果连接之上立即发送，那么手机端的onServiceDiscovered尚未触发，这样Characteristic的值就获取不了(因为你的service，Characteristic都尚未初始化好)，从而导致失败。</li>
+</ul>
+<p>解决的办法有3个：<br>1）建立一套ACK机制，蓝牙硬件设备不断的广播，直到所有的数据都收到返回的ACK确认才不再广播即可。<br>2）更好的办法是，当手机端onServiceDiscovered触发后，并且service，Characteristic都初始化好后，发送指令给蓝牙硬件设备(即writeCharacteristic)表示手机端已经准备好，可以发送数据给我了，蓝牙硬件设备收到后再发送数据，这样能很好的保证数据不丢失。<br>3) 最好的办法是1）和 2）的结合，即发送准备好的指令，然后让智能硬件发送数据，然后在接收数据的过程中，使用ACK机制确保数据没有任何丢失。</p>
+<ul>
+<li><p>4.Read/Write Characteristic/Descriptor 等都是异步的，即立即返回，等待回调。因此如果Android手机底层自身如果没有做请求的同步顺序执行的话，那么当有很多请求几乎同时进行时，回调顺序是无法保证的。此时就造成错误，这也会导致很多蓝牙4.0不能兼容某些Android的原因，因此需要自己提供一套同步机制，如RequestQueue，来保证request&amp;response 一个接一个高效有序的进行，即下一个request必须等到上一个request的response返回之后再执行。</p>
+</li>
+<li><p>5.Read/Write Characteristic/Descriptor/RemoteRssi()，一般在不同的线程中回调。(除了onDescriptorWrite返回的线程与写入线程为同一个线程???)</p>
+</li>
+</ul>
+<p>BluetoothDevice.conncectGatt(),<br>BluetoothGatt.connect(),<br>BluetoothGatt.disconnect(),<br>BluetoothGatt.discoverServices()</p>
+<p>最好都在主线程，否则会遇到很多意想不到的麻烦。</p>
+<ul>
+<li><p>6.BLE的特征一次读写最大长度20字节。</p>
+</li>
+<li><p>7.Android手机会对连接过的BLE设备的Services进行缓存，若设备升级后Services等有改动，则程序会出现通讯失败。此时就得刷新缓存，反射调用BluetoothGatt类总的refresh()方法。</p>
+</li>
+<li><p>8.startLeScan(UUID[], LeScanCallback)在Android 4.4及以下手机中似乎只支持16位的短UUID，不支持128位。</p>
+</li>
+<li><p>9.connectGatt() 在某些三星手机上只能在UI线程调用。</p>
+</li>
+<li><p>10.Android L 新API扫描设备换为 startScan(List, ScanSettings, ScanCallback)。</p>
+</li>
+<li><p>11.Android M 必须拥有定位权限才能扫描BLE设备。</p>
+</li>
+<li><p>12.一个主设备(例如Android手机)可以同时连接多个从设备(一般为6个，例如智能硬件。超过就连接不上了)，一个从设备只能被一个主设备连接，一旦从设备连接上主设备，就停止广播，断开连接则继续广播。在任何时刻都只能最多一个设备在尝试建立连接。如果同时对多个蓝牙设备发起建立Gatt连接请求。如果前面的设备连接失败了，则后面的设备请求会被永远阻塞住，不会有任何连接回调。所以建议：如果要对多个设备发起连接请求，最好是一个接一个的顺序同步请求管理。</p>
+</li>
+<li><p>13.任何出错，超时，用完就马上调用Gatt.disconnect(), Gatt.close()。</p>
+</li>
+<li><p>14.从bindService 到 onServiceConnected 这个回调花费时间较长， onServiceConnected 这个回调很可能在 MainActivity onResume之后才执行, 所以不要指望onResume里去执行扫描，因为此时serviceConnected 回调都尚未执行</p>
+</li>
+<li><p>15.getBtAdapter().enable()是异步，立即返回，但从 off 到 on 的过程需要一个时间所以只能监听系统broadcast发出的intent里的state</p>
+</li>
+<li><p>16.. onCharacteristicWrite … 等等是指本机写数据指令已经成功发送出去，并且智能硬件已经处理完回应回来了，另外，当智能硬件端要求发送的指令有顺序的话，那么这边不能发送速度过快，即不能在onCharacteristicWrite里立即发送下一条指令。例如OAD/OTA等等，字节必须严格按照image的字节顺序发送出去。</p>
+</li>
+<li><p>17.在writeCharacteristic时，若速度过快（例如在OAD时），会发现发送出去的数据有可能不是你自己真正发出去的，在onCharacteristicWrite里打印出可以确定。</p>
+</li>
+<li><p>18.App端的关于同一个UUID的2个指令不能同时发出去，这样会导致硬件端无法辨识，所以需要串行发送，即等其中一个发送回调成功之后，再进行下一个。</p>
+</li>
+<li><p>19.多次扫描蓝牙，在华为荣耀，魅族M3 NOTE 中有的机型，会发现多次断开–扫描–断开–扫描… 会扫描不到设备，此时需要在断开连接后，不能立即扫描，而是要先停止扫描后，过2秒再扫描才能扫描到设备。</p>
+</li>
+<li><p>20.扫描尽量不要放在主线程进行，可以放入子线程里。不然有些机型会出现 do too many work in main thread.</p>
+</li>
+<li><p>21.BluetoothGatt.disconnect() 之后不能要马上BluetoothGatt.close().建议在 BluetoothGattCallback中收到BluetoothGatt.STATE_DISCONNECTED时才BluetoothGatt.close()</p>
+</li>
+</ul>
+<p>理由：disconnect() 之后调用close()虽然大部分手机调用正常，但存在手机蓝牙连接实际没有断开！！！这个会造成蓝牙资源泄露的问题，甚至蓝牙假死。同时这个最好做一个超时机制来释放连接，避免存在BluetoothGattCallback没有回调的情况。（注：之前有遇到手机在极端情况下没有回调）</p>
+<ul>
+<li>22.蓝牙api调用过程建议采用notify() 和 wait()</li>
+</ul>
+<p>理由：蓝牙的api调用基本都是异步的，但整个过程都是按顺序来的（connect-&gt;discovertServices-&gt;write-&gt;read…..disconnect）,尤其是Characteristic读写非常复杂的时候，一旦出错会让你非常奔溃，甚至会导致蓝牙假死问题！！！所以建议封装异步调用成为同步调用(即用notify和wait),来大幅度地减少出错的可能。</p>
+<ul>
+<li>23.蓝牙 startScan 分了低版本(5.0之下)和高版本(5.0以上)的api，低版本中建议startLeScan不要传递uuid，高版本中建议不要用到onBatchScanResults的方式。</li>
+</ul>
+<p>理由：存在少部分机型底层没有处理好，导致完全扫描不到任何数据。</p>
+<ul>
+<li>24.Android 7.0 以上系统不要在短时间内调用多次 startScan</li>
+</ul>
+<p>理由：Android 7.0系统限制在 30s内最多只能扫描5次，用完之后在30s内是扫不到任何蓝牙的。</p>
+<ul>
+<li>25.BluetoothGatt.requestConnectionPriority() 方法慎用（建议做机型覆盖）</li>
+</ul>
+<p>理由：该方法可以修改蓝牙的连接间隔，加快蓝牙的连接过程（connect 到 discoverServices）,但是在比较旧的机型(类似华为)发现，在连续调用几次后，后面的蓝牙变得连接非常不稳定.</p>
+<ul>
+<li>26.不要持续调用蓝牙扫描</li>
+</ul>
+<p>理由：在部分机型持续一定时间扫描后会发现需要重启蓝牙才能恢复扫描，这个现象在魅族手机上有遇到过；很久之前遇到蓝牙进行重复的扫描，停止扫描两个操作，一定时间后在传说中的国民手机红米上会出现这个bug，而且还必须重启手机才能恢复蓝牙功能。</p>
+<ul>
+<li>27.手机做为中心设备建立连接，但由外设断开蓝牙连接时容易导致外设一定时间内连接不上，所以建立最好不要由外设来进行断开连接。</li>
+</ul>
+<p>理由：这个可能跟蓝牙的一个断开协议有关系，正常来讲中心设备只要收到外设的断开指令后还会回馈给外设一个“收到断开”的回复，外设收到断开回复流程才算完成。但假设中心设备没有回复时，外设会持续等待直到超时断开（一般是10s），意思就是从端设备需要至少10s后才能再次被连接上。（该情况在oppo手机上100%必现）</p>
+<ul>
+<li>28.采用BluetoothManager.getConnectedDevices(int profile)来检查当前蓝牙连接的情况</li>
+</ul>
+<p>理由：可以用来检测蓝牙资源有没有释放干净，因为避免繁琐的异步通信中容易出差。不过此法返回的连接数为空时，也不代表蓝牙的连接完全释放干净。</p>
+<ul>
+<li>29.在小米mix2手机上，黑屏模式，service处于后台，蓝牙也没有调用，持续几分钟后，想调用蓝牙startScan方法，但无法扫描蓝牙或者扫描报异常，并且会有此日志–》 BluetoothLeScanner: start scan is blocked。</li>
+</ul>
+<p>解决方法：<br>方案一：设置-》电量和性能 -》省电忧化 -》应用智能省电-》选择应用-》无限制<br>方案二：android 8.0 出了新的startScan方法，还可用于近场拉活进程(传送门)</p>
+<h3 id="二、蓝牙广播踩到的坑"><a href="#二、蓝牙广播踩到的坑" class="headerlink" title="二、蓝牙广播踩到的坑"></a>二、蓝牙广播踩到的坑</h3><p>使用蓝牙广播可以用来做许多事情，市面上有类似Ibeacon的产品就是基于蓝牙广播类现的，但在android 中还是有很多坑的。</p>
+<ul>
+<li><p>1.android 5.0 以上才支持广播这就算了，在5.0以上部分机器还不支持蓝牙广播，例如：亲儿子nexus 5,甚至华为有些到达7.0系统的手机还不支持。</p>
+</li>
+<li><p>2.存在缓存，许多手机会将上一次广播过的内容再次广播出来一下才广播正常内容</p>
+</li>
+<li><p>3.android 对比ios，普遍机型广播信号强度弱，广播间隔偏少</p>
+</li>
+<li><p>4.存在手机进行多次广播后，蓝牙会自动重启（oppo手机上有遇到此类问题）</p>
+</li>
+<li><p>5.手机端广播出来的蓝牙mac地址不是固定的，每广播一次，变化一次</p>
+</li>
+<li><p>6.AdvertiseSettings.Builder.setTimeout() 调用时注意!!!</p>
+</li>
+</ul>
+<p>理由：Oppo r11,三星 Galaxy On7 （android 7.0)等机型，调用BluetoothLeAdvertiser.startAdvertising() 偶尔返回 ADVERTISE_FAILED_ALREADY_STARTED，偿试多次返回ADVERTISE_FAILED_TOO_MANY_ADVERTISERS,这很明显存在蓝牙广播泄漏问题!!!!</p>
+<p>解决方法：由于该现象只在7.0以上的机型出现，所以本人只针对7.0以上的机型做处理。去调setTimeout()方法，改为用线程延时调用BluetoothLeAdvertiser.stopAdvertising()停止广播</p>
+<p><strong><em>参考连接</em></strong></p>
+<p><a href="https://blog.csdn.net/qingtiantianqing/article/details/52459629" target="_blank" rel="noopener">1.https://blog.csdn.net/qingtiantianqing/article/details/52459629</a></p>
+</div><div class="post-copyright"><blockquote><p>原文作者: 沐白</p><p>原文链接: <a href="https:mubai.site/2020-1-4-蓝牙知识模块之Android坑/">https:mubai.site/2020-1-4-蓝牙知识模块之Android坑/</a></p><p>版权声明: 转载请注明出处(必须保留作者署名及链接)</p></blockquote></div><div class="tags"><a href="/tags/Android/">Android</a></div><div class="post-share"><div class="social-share"><span>分享到:</span></div></div><div class="post-nav"><a href="/2020-1-9-蓝牙知识模块之Android开发/" class="pre">蓝牙知识模块之Android开发之旅</a><a href="/2019-12-25-多线程交替打印数组/" class="next">多线程交替打印数组元素</a></div><div id="comments"></div></div></div></div><div class="layout-r"><div id="sidebar"><div class="search-pla"></div><div id="toc" class="widget"><div class="widget-title"><i class="fa fa-fei">文章目录</i></div><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、Android蓝牙4-0-BLE开发坑总结"><span class="toc-number">1.</span> <span class="toc-text">一、Android蓝牙4.0 BLE开发坑总结:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、蓝牙广播踩到的坑"><span class="toc-number">2.</span> <span class="toc-text">二、蓝牙广播踩到的坑</span></a></li></ol></div><div class="widget"><div class="widget-title"><i class="fa fa-xie"> 最新文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2020-3-21-礼物专线/">GiftForGirl</a></li><li class="post-list-item"><a class="post-list-link" href="/2020-1-9-蓝牙知识模块之Android开发/">蓝牙知识模块之Android开发之旅</a></li><li class="post-list-item"><a class="post-list-link" href="/2020-1-4-蓝牙知识模块之Android坑/">蓝牙知识模块之Android坑</a></li><li class="post-list-item"><a class="post-list-link" href="/2019-12-25-多线程交替打印数组/">多线程交替打印数组元素</a></li><li class="post-list-item"><a class="post-list-link" href="/2019-12-30-蓝牙知识模块之简介/">蓝牙知识模块之简介</a></li><li class="post-list-item"><a class="post-list-link" href="/2019-12-20-沉浸式状态栏/">沉浸式状态栏</a></li><li class="post-list-item"><a class="post-list-link" href="/2019-12-2-Rxjava2 太多方法了，记不住呀/">Rxjava2 太多方法了，记不住呀</a></li><li class="post-list-item"><a class="post-list-link" href="/2019-11-2-Activity 布局加载分析/">Activity 布局加载分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2019-10-28-Application的创建、Activity的创建/">Application的创建、Activity的创建</a></li><li class="post-list-item"><a class="post-list-link" href="/2019-3-31-5.1旅游攻略/">5.1节日旅游攻略</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-gui"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/开发规范/">开发规范</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/总结/">总结</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/机器学习/">机器学习</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构/">架构</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/物联网/">物联网</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/算法/">算法</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/闲文/">闲文</a><span class="category-list-count">5</span></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-biao"> 标签</i></div><div class="tagcloud"><a href="/tags/开发规范/" style="font-size: 15px;">开发规范</a> <a href="/tags/Android/" style="font-size: 15px;">Android</a> <a href="/tags/闲文/" style="font-size: 15px;">闲文</a> <a href="/tags/算法/" style="font-size: 15px;">算法</a> <a href="/tags/架构/" style="font-size: 15px;">架构</a> <a href="/tags/总结/" style="font-size: 15px;">总结</a> <a href="/tags/设计模式/" style="font-size: 15px;">设计模式</a> <a href="/tags/机器学习/" style="font-size: 15px;">机器学习</a> <a href="/tags/物联网/" style="font-size: 15px;">物联网</a> <a href="/tags/Maven/" style="font-size: 15px;">Maven</a> <a href="/tags/简历/" style="font-size: 15px;">简历</a> <a href="/tags/礼物专线/" style="font-size: 15px;">礼物专线</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-archive"> 归档</i></div><ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">一月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-you"> 友情链接</i></div><ul></ul><a href="https://juejin.im/" title="掘金" target="_blank">掘金</a><ul></ul><a href="https://www.wanandroid.com/" title="玩安卓" target="_blank">玩安卓</a><ul></ul><a href="https://www.simon96.online/2018/10/12/hexo-tutorial/" title="遇见西门" target="_blank">遇见西门</a></div></div></div></div><a id="totop" href="#top"></a><div id="footer"><div class="footer-info"><p><a href="/baidusitemap.xml">网站地图</a> |  <a href="/atom.xml">订阅本站</a> |  <a href="/about/">联系博主</a></p><p>本站总访问量：<i id="busuanzi_container_site_pv"><i id="busuanzi_value_site_pv"></i></i>次，本站总访客数:<i id="busuanzi_container_site_uv"><i id="busuanzi_value_site_uv"></i></i>人</p><p><span> Copyright &copy;<a href="/." rel="nofollow">沐白.</a></span><span> Theme by<a rel="nofollow" target="_blank" href="https://github.com/chaooo/hexo-theme-BlueLake"> BlueLake.</a></span><span> Count by<a href="http://busuanzi.ibruce.info/"> busuanzi.</a></span><span> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a></span></p></div></div></div><script src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script><script type="text/javascript" src="/js/search.json.js?v=2.0.3"></script><script type="text/javascript" src="/js/toctotop.js?v=2.0.3" async></script><link rel="stylesheet" type="text/css" href="/share/css/share.css"><script type="text/javascript" src="/share/js/social-share.js" charset="utf-8"></script><script type="text/javascript" src="/share/js/qrcode.js" charset="utf-8"></script><script src="/live2dw/lib/L2Dwidget.min.js?bd2294fafea3389ee458f1d9be5a2157"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body></html>
